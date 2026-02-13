@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <h2>Follow-up Settings</h2>
+
+  <select id="daySelector">
+    <option value="2">2 Days</option>
+    <option value="3">3 Days</option>
+    <option value="5">5 Days</option>
+    <option value="custom">Custom</option>
+  </select>
+
+  <input type="number" id="customDays" placeholder="Enter days" min="1" style="display:none; margin-top:5px;" />
+
+  <button id="saveBtn">Save</button>
+
+  <hr>
+
+  <h2>Follow-ups Needed</h2>
+  <ul id="list"></ul>
+
+  <script src="popup.js"></script>
+</body>
+</html>

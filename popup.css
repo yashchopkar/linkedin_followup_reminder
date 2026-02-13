@@ -1,0 +1,15 @@
+body {
+  font-family: Arial, sans-serif;
+  width: 260px;
+  padding: 10px;
+}
+
+h2 {
+  margin-bottom: 10px;
+}
+
+li {
+  margin-bottom: 6px;
+  color: red;
+  font-weight: bold;
+}
