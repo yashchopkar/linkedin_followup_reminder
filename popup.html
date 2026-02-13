@@ -4,23 +4,35 @@
   <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-  <h2>Follow-up Settings</h2>
 
-  <select id="daySelector">
-    <option value="2">2 Days</option>
-    <option value="3">3 Days</option>
-    <option value="5">5 Days</option>
-    <option value="custom">Custom</option>
-  </select>
+  <div class="container">
 
-  <input type="number" id="customDays" placeholder="Enter days" min="1" style="display:none; margin-top:5px;" />
+    <h1>Follow-up Engine</h1>
 
-  <button id="saveBtn">Save</button>
+    <div class="card">
+      <label>Follow-up After</label>
 
-  <hr>
+      <select id="daySelector">
+        <option value="2">2 Days</option>
+        <option value="3">3 Days</option>
+        <option value="5">5 Days</option>
+        <option value="custom">Custom</option>
+      </select>
 
-  <h2>Follow-ups Needed</h2>
-  <ul id="list"></ul>
+      <input type="number" id="customDays" placeholder="Enter days" min="1" />
+
+      <div class="btn-group">
+        <button id="saveBtn" class="primary">Save</button>
+        <button id="refreshBtn" class="secondary">Refresh</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Follow-ups Needed</h3>
+      <ul id="list"></ul>
+    </div>
+
+  </div>
 
   <script src="popup.js"></script>
 </body>
