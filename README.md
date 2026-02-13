@@ -12,7 +12,7 @@ A Chrome Extension that highlights LinkedIn chats requiring follow-up after sele
 
 ## Installation (Manual)
 
-1. Download this repository as ZIP
+1. Download this repository as ZIP  c
 2. Extract the folder
 3. Open Chrome and go to `chrome://extensions`
 4. Enable **Developer Mode**
