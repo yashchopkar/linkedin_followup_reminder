@@ -1,57 +1,99 @@
-document.addEventListener("DOMContentLoaded", () => {
-  const selector = document.getElementById("daySelector");
-  const customInput = document.getElementById("customDays");
-  const saveBtn = document.getElementById("saveBtn");
-  const list = document.getElementById("list");
+const listDiv = document.getElementById("list");
+const searchInput = document.getElementById("search");
+const daysSelect = document.getElementById("daysSelect");
+const templateBox = document.getElementById("template");
 
-  // Show/hide custom input
-  selector.addEventListener("change", () => {
-    if (selector.value === "custom") {
-      customInput.style.display = "block";
-    } else {
-      customInput.style.display = "none";
-    }
-  });
-
-  // Save selected days
-  saveBtn.addEventListener("click", () => {
-    let days = selector.value;
-
-    if (days === "custom") {
-      days = customInput.value;
-      if (!days || days < 1) {
-        alert("Enter valid custom days");
-        return;
-      }
+/* ===============================
+   LOAD INITIAL DATA
+================================ */
+chrome.storage.local.get(
+  ["followups", "threshold", "template"],
+  (data) => {
+    if (data.threshold) {
+      daysSelect.value = data.threshold;
     }
 
-    chrome.storage.local.set({ followUpDays: parseInt(days) }, () => {
+    if (data.template) {
+      templateBox.value = data.template;
+    }
 
-      // Trigger refresh in content script
-      chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, { type: "REFRESH_CHECK" });
-      });
+    renderList(data.followups || []);
+  }
+);
 
-    });
+/* ===============================
+   SAVE DAYS + TRIGGER RESCAN
+================================ */
+daysSelect.addEventListener("change", () => {
+  const value = parseInt(daysSelect.value);
+
+  chrome.storage.local.set({ threshold: value }, () => {
+    notifyContentToRescan();
   });
+});
 
-  // Load follow-ups list
-  function loadFollowUps() {
-    chrome.storage.local.get("followUps", (data) => {
-      list.innerHTML = "";
+/* ===============================
+   SAVE TEMPLATE
+================================ */
+templateBox.addEventListener("input", () => {
+  chrome.storage.local.set({
+    template: templateBox.value
+  });
+});
 
-      if (!data.followUps || data.followUps.length === 0) {
-        list.innerHTML = "<li>No follow-ups needed</li>";
-        return;
-      }
+/* ===============================
+   SEARCH FILTER
+================================ */
+searchInput.addEventListener("input", () => {
+  chrome.storage.local.get(["followups"], (data) => {
+    renderList(data.followups || []);
+  });
+});
 
-      data.followUps.forEach(name => {
-        const li = document.createElement("li");
-        li.innerText = name;
-        list.appendChild(li);
-      });
-    });
+/* ===============================
+   RENDER LIST
+================================ */
+function renderList(data) {
+  listDiv.innerHTML = "";
+
+  const search = searchInput.value.toLowerCase();
+
+  const filtered = data.filter(item =>
+    item.name.toLowerCase().includes(search)
+  );
+
+  if (filtered.length === 0) {
+    listDiv.innerHTML = "<p style='text-align:center;'>No follow-ups needed</p>";
+    return;
   }
 
-  loadFollowUps();
-});
+  filtered.forEach(item => {
+    const div = document.createElement("div");
+    div.className = "item";
+
+    const text = document.createElement("span");
+    text.innerText = `${item.name} • ${item.days} days ago`;
+
+    const btn = document.createElement("button");
+    btn.innerText = "Open Chat";
+
+    btn.addEventListener("click", () => {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.update(tabs[0].id, { url: item.url });
+      });
+    });
+
+    div.appendChild(text);
+    div.appendChild(btn);
+    listDiv.appendChild(div);
+  });
+}
+
+/* ===============================
+   NOTIFY CONTENT.JS TO RESCAN
+================================ */
+function notifyContentToRescan() {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.tabs.sendMessage(tabs[0].id, { action: "rescan" });
+  });
+}

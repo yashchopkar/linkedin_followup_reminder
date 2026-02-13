@@ -124,3 +124,8 @@ chrome.runtime.onMessage.addListener((message) => {
     checkConversations();
   }
 });
+chrome.runtime.onMessage.addListener((message) => {
+  if (message.action === "rescan") {
+    scanConversations();   // your existing scan function
+  }
+});
